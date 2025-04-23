@@ -23,6 +23,18 @@ class Usuario extends Conexion{
         
     }
 
+    public static function existeUsuario(string $nombre): bool{
+        $q="select id from usuarios where username=:u";
+        $stmt=self::executeQuery($q, [':u'=>$nombre], true);
+        return (bool) $stmt->fetch(PDO::FETCH_OBJ);
+
+    }
+
+    public function create(){
+        $q="insert into usuarios(username, password) values(?, ?)";
+        self::executeQuery($q, [$this->username, $this->password], false);
+    }
+
     public static function loginValido(string $usuario, string $password): bool{
         $q="select password from usuarios where username=:u";
         $stmt=self::executeQuery($q, [':u'=>$usuario], true);

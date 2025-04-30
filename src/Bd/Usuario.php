@@ -27,7 +27,13 @@ class Usuario extends Conexion{
         $q="select id from usuarios where username=:u";
         $stmt=self::executeQuery($q, [':u'=>$nombre], true);
         return (bool) $stmt->fetch(PDO::FETCH_OBJ);
+    }
 
+    public static function getAuthUserId(string $username): int{
+        $q="select id from usuarios where username=:u";
+        $stmt=self::executeQuery($q, [':u'=>$username], true);
+        return $stmt->fetch(PDO::FETCH_OBJ)->id;
+        //return ($stmt->fetchAll(PDO::FETCH_OBJ))[0]->id;
     }
 
     public function create(){

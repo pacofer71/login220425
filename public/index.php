@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 use App\Bd\Producto;
 
     require_once __DIR__."/../vendor/autoload.php";

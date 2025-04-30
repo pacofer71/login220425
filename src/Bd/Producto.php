@@ -35,6 +35,23 @@ class Producto extends Conexion{
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public static function existeProducto(string $nombre): bool{
+        $q="select id from productos where nombre=:n";
+        $stmt=self::executeQuery($q, [':n'=>$nombre], true);
+        return (bool) $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function create(){
+        $q="insert into productos(nombre, precio, imagen, user_id) values(:n, :p, :i, :ui)";
+        $parametros=[
+            ':n'=>$this->nombre,
+            ':p'=>$this->precio,
+            ':i'=>$this->imagen,
+            ':ui'=>$this->user_id,
+        ];
+        self::executeQuery($q, $parametros, false);
+    }
+
 
     /**
      * Set the value of id

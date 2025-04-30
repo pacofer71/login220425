@@ -1,3 +1,69 @@
+<?php
+
+use App\Bd\Producto;
+use App\Bd\Usuario;
+use App\Utils\Validaciones;
+
+session_start();
+$username = $_SESSION['username'] ?? null;
+
+if (!$username) {
+    header("Location:../");
+    exit;
+}
+require_once __DIR__ . "/../../vendor/autoload.php";
+//si estamos aqui es pq estamos logeado, recupero el id de usuario logeado
+$user_id = Usuario::getAuthUserId($username);
+
+//Procesamos el form
+if (isset($_POST['nombre'])) {
+    //1.- Recojo y limpio cadenas
+    $nombre = Validaciones::sanearCadenas($_POST['nombre']);
+    $precio = (float) Validaciones::sanearCadenas($_POST['precio']);
+
+    //2.- Validamos
+    $errores = false;
+    if (!Validaciones::longitudCampoValido('nombre', $nombre, 3, 55)) {
+        $errores = true;
+    }else{
+        if(Validaciones::existeProducto($nombre)) $errores=true;
+    }
+    if (!Validaciones::isPrecioValido($precio)) {
+        $errores = true;
+    }
+    //Procesamos la simpática imagen del producto
+    $imagen = '/img/default.png';
+    if (is_uploaded_file($_FILES['imagen']['tmp_name'])) {
+        //se ha subido un archivo, comprobaremos que sea una imagen y que no exceda de un tamaño
+        if (!Validaciones::imageValida($_FILES['imagen']['type'], $_FILES['imagen']['size'])) {
+            $errores = true;
+        } else {
+            //el archivo que emps pasado es correcto, procedemos a guardarlo
+            $imagen = "/img/" . uniqid() . "_" . $_FILES['imagen']['name']; // "/img/1234923_nombre.jpg"
+            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], "..$imagen")) {
+                //no se ha podido mover el archivo de la carpeta temporal
+                // a la ruta deseada, normalmente por problemas o de permisos o ruta mal
+                $errores = true;
+                $_SESSION['err_imagen'] = "*** La imagen se subio pero NO se ha podido guardar";
+            }
+        }
+    }
+
+    if ($errores) {
+        header("Location:nuevo.php");
+        exit;
+    }
+    //todo ha ido bien gardamos el producto
+    (new Producto)
+        ->setNombre($nombre)
+        ->setPrecio($precio)
+        ->setImagen($imagen)
+        ->setUserId($user_id)
+        ->create();
+    $_SESSION['mensaje']="Nuevo producto guardado";
+    header("Location:index.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -25,13 +91,19 @@
                 <i class="fas fa-user text-gray-500"></i>
                 <input type="text" name="nombre" placeholder="Nombre" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
             </div>
+            <?php
+            Validaciones::pintarError('err_nombre');
+            ?>
 
 
             <!-- Precio -->
             <div class="flex items-center space-x-2 mt-4">
                 <i class="fas fa-align-left text-gray-500"></i>
-                <input type="number" step="0.02" name="precio" placeholder="Precio" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
+                <input type="number" step="0.01" name="precio" placeholder="Precio" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
             </div>
+            <?php
+            Validaciones::pintarError('err_precio');
+            ?>
 
 
             <!-- Imagen -->
@@ -45,6 +117,9 @@
                     oninput="preview.src=window.URL.createObjectURL(this.files[0])">
                 <img id="preview" class="w-20 h-20 object-cover object-center rounded-md ml-4" />
             </div>
+            <?php
+            Validaciones::pintarError('err_imagen');
+            ?>
 
 
             <!-- Botones -->

@@ -5,10 +5,10 @@ echo <<<TXT
       <div class="flex justify-between items-center py-3">
           <!-- Left side - Navigation items -->
           <div class="flex space-x-6">
-              <a href="#" class="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded transition">
+              <a href="../" class="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded transition">
                   <i class="fas fa-home mr-2"></i>HOME
               </a>
-              <a href="#" class="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded transition">
+              <a href="./" class="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded transition">
                   <i class="fas fa-box-open mr-2"></i>PRODUCTOS
               </a>
           </div>

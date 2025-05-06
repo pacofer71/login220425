@@ -40,8 +40,8 @@ class Validaciones{
         }
         return false;
     }
-    public static function existeProducto(string $nombre): bool{
-        if(Producto::existeProducto($nombre)){
+    public static function existeProducto(string $nombre, ?int $id=null): bool{
+        if(Producto::existeProducto($nombre, $id)){
             $_SESSION['err_nombre']="*** Error el nombre de producto YA existe";
             return true;
         }

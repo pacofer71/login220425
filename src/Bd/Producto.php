@@ -35,9 +35,10 @@ class Producto extends Conexion{
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public static function existeProducto(string $nombre): bool{
-        $q="select id from productos where nombre=:n";
-        $stmt=self::executeQuery($q, [':n'=>$nombre], true);
+    public static function existeProducto(string $nombre, ?int $id=null): bool{
+        $q=(is_null($id)) ? "select id from productos where nombre=:n" : "select id from productos where nombre=:n AND id != :i"  ;
+        $parametros=(is_null($id)) ? [':n'=>$nombre] : [':n'=>$nombre, ':i'=>$id];
+        $stmt=self::executeQuery($q, $parametros, true);
         return (bool) $stmt->fetch(PDO::FETCH_OBJ);
     }
 
@@ -50,6 +51,26 @@ class Producto extends Conexion{
             ':ui'=>$this->user_id,
         ];
         self::executeQuery($q, $parametros, false);
+    }
+
+    public static function delete(int $id): void{
+        $q="delete from productos where id=:i";
+        self::executeQuery($q, [':i'=>$id], false);
+    }
+    public static function authorize(int $user_id, int $producto_id): bool{
+        $q="select id from productos where id=? AND user_id=?";
+        $stmt=self::executeQuery($q, [$producto_id, $user_id], true);
+        return (bool) $stmt->fetch(PDO::FETCH_OBJ);
+    }
+    public static function show(int $id): array{
+        $q="select * from productos where id=?";
+        $stmt=self::executeQuery($q, [$id], true);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+    public static function update(int $id, string $nombre, float $precio, string $imagen): void{
+        $q="update productos set nombre=?, precio=?, imagen=? where id=?";
+        self::executeQuery($q, [$nombre, $precio, $imagen, $id], false);
+
     }
 
 

@@ -72,7 +72,16 @@ $productos = Producto::read($username);
                                 <?= $item->precio ?>
                             </td>
                             <td class="px-6 py-4">
-                                <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
+                                <form action="borrar.php" method="POST">
+                                    
+                                    <input type="hidden" name="id" value="<?= $item->id ?>" />
+                                    <a href="edit.php?id=<?= $item->id ?>">
+                                        <i class="fas fa-edit text-green-500 text-lg mr-2"></i>
+                                    </a>
+                                    <button type="submit">
+                                        <i class="fas fa-trash text-lg text-red-600"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach ?>
@@ -86,6 +95,32 @@ $productos = Producto::read($username);
             No tiene nigún producto, aprovecha para crear alguno.
         </div>
     <?php endif; ?>
+    <?php
+    if (isset($_SESSION['error'])) {
+        echo <<<TXT
+            <script>
+                Swal.fire({
+                icon: "error",
+                title: "No autorizado!!!",
+                showConfirmButton: true
+                });
+            </script>
+            TXT;
+        unset($_SESSION['error']);
+    }
+    if (isset($_SESSION['mensaje'])) {
+        echo <<<TXT
+            <script>
+                Swal.fire({
+                icon: "success",
+                title: "{$_SESSION['mensaje']}",
+                showConfirmButton: true
+                });
+            </script>
+            TXT;
+        unset($_SESSION['mensaje']);
+    }
+    ?>
 </body>
 
 </html>
